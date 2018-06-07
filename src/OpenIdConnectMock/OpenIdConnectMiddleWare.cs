@@ -10,9 +10,11 @@
 
     internal sealed class OpenIdConnectMiddleWare : OwinMiddleware
     {
+        private static JsonSerializerSettings serializerSettings = new JsonSerializerSettings() { Formatting = Formatting.Indented };
+
         private readonly Uri baseUri;
 
-        public OpenIdConnectMiddleWare(Uri baseUri, OwinMiddleware next)
+        public OpenIdConnectMiddleWare(OwinMiddleware next, Uri baseUri)
             : base(next)
         {
             this.baseUri = baseUri;
@@ -43,7 +45,7 @@
             };
 
             context.Response.StatusCode = 200;
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(configuration));
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(configuration, serializerSettings));
         }
 
         private async Task HandleAuthorizeRequest(IOwinContext context)
