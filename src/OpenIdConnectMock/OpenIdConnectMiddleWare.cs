@@ -21,22 +21,10 @@
                 await HandleOpenIdConfigurationRequest(context);
             }
 
-            if (context.Request.Path.Value.Contains("keys"))
+            if (context.Request.Path.Value.EndsWith("authorize"))
             {
-                await HandleKeysRequest(context);
+                await HandleAuthorizeRequest(context);
             }
-
-            if (context.Request.Path.Value.Contains("authorize"))
-            {
-                await HandleKeysRequest(context);
-            }
-
-
-            if (context.Request.Path.Value.Contains("token"))
-            {
-                await HandleKeysRequest(context);
-            }
-
 
             await Next.Invoke(context);
         }
@@ -46,7 +34,7 @@
             throw new NotImplementedException();
         }
 
-        private async Task HandleKeysRequest(IOwinContext context)
+        private async Task HandleAuthorizeRequest(IOwinContext context)
         {
             throw new NotImplementedException();
         }
