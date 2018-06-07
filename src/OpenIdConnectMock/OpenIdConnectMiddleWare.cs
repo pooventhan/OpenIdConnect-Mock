@@ -4,7 +4,7 @@
     using System.Threading.Tasks;
     using Microsoft.Owin;
 
-    public class OpenIdConnectMiddleWare : OwinMiddleware
+    internal sealed class OpenIdConnectMiddleWare : OwinMiddleware
     {
         private readonly Uri baseUri;
 

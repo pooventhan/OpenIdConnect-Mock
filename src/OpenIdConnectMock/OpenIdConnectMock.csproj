@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OpenIdConnectExtensions.cs" />
     <Compile Include="OpenIdConnectMiddleWare.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
