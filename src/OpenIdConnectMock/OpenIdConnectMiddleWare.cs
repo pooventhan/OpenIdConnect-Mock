@@ -1,9 +1,12 @@
 ﻿namespace OpenIdConnectMock
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using System.Web;
     using Microsoft.Owin;
+    using Newtonsoft.Json;
+    using OpenIdConnectMock.Models;
 
     internal sealed class OpenIdConnectMiddleWare : OwinMiddleware
     {
@@ -33,7 +36,14 @@
 
         private async Task HandleOpenIdConfigurationRequest(IOwinContext context)
         {
-            throw new NotImplementedException();
+            var configuration = new OpenIdConfiguration
+            {
+                ResponseModeSupported = new List<string> { "query", "fragment", "form_post" },
+                ResponseTypeSupported = new List<string> { "code", "code id_token", "code token", "code id_token token", "id_token", "id_token token", "token", "token id_token" }
+            };
+
+            context.Response.StatusCode = 200;
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(configuration));
         }
 
         private async Task HandleAuthorizeRequest(IOwinContext context)
@@ -47,7 +57,8 @@
 
             // Return response.
 
-            throw new NotImplementedException();
+            context.Response.StatusCode = 200;
+            await context.Response.WriteAsync(string.Empty);
         }
     }
 }
