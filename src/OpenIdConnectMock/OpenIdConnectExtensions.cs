@@ -7,7 +7,7 @@
     {
         public static IAppBuilder UseOpenIdConnectMock(this IAppBuilder app, Uri baseUri)
         {
-            app.Use(typeof(OpenIdConnectMiddleWare));
+            app.Use(typeof(OpenIdConnectMiddleWare), baseUri);
             return app;
         }
     }
