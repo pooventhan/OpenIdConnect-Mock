@@ -97,6 +97,9 @@
 
             if (responseMode == "form_post")
             {
+                context.Response.StatusCode = 200;
+                await context.Response.WriteAsync("Authentication succesfull..");
+
                 using (var httpClient = new HttpClient())
                 {
                     var redirectLocation = string.Format("id_token={0}&session_state={1}&state={2}", code, Guid.NewGuid().ToString().ToUpper(), Guid.NewGuid().ToString().ToUpper());
