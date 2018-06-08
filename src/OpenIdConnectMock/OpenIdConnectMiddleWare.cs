@@ -92,6 +92,7 @@
             var responseType = queries["response_type"];
             var scope = queries["openid"];
             var state = queries["state"];
+            var nonce = queries["nonce"];
 
             const string code = "AwABAAAAvPM1KaPlrEqdFSBzjqfTGBCmLdgfSTLEMPGYuNHSUYBrqqf_ZT_p5uEAEJJ_nZ3UmphWygRNy2C3jJ239gV_DBnZ2syeg95Ki-374WHUP-i3yIhv5i-7KU2CEoPXwURQp6IVYMw-DjAOzn7C3JCu5wpngXmbZKtJdWmiBzHpcO2aICJPu1KvJrDLDP20chJBXzVYJtkfjviLNNW7l7Y3ydcHDsBRKZc3GuMQanmcghXPyoDg41g8XbwPudVh7uCmUponBQpIhbuffFP_tbV8SNzsPoFz9CLpBCZagJVXeqWoYMPe2dSsPiLO9Alf_YIe5zpi-zY4C3aLw5g9at35eZTfNd0gBRpR5ojkMIcZZ6IgAA";
 
@@ -102,7 +103,9 @@
 
                 using (var httpClient = new HttpClient())
                 {
-                    var redirectLocation = string.Format("id_token={0}&session_state={1}&state={2}", code, Guid.NewGuid().ToString().ToUpper(), Guid.NewGuid().ToString().ToUpper());
+                    var idToken = BearerTokenBuilder.CreateToken("I am administrator", "admin@experian.com", "Administrator", this.defaultPolicy, nonce);
+
+                    var redirectLocation = string.Format("state={0}&code={1}&id_token={2}", state, Guid.NewGuid().ToString().ToUpper(), idToken);
                     await httpClient.PostAsync(redirectUri, new StringContent(redirectLocation));
                 }
             }
