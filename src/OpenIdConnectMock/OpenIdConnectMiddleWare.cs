@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web;
     using Microsoft.Owin;
@@ -40,6 +41,10 @@
             {
                 await HandleOpenIdConfigurationRequest(context);
             }
+            else if (context.Request.Path.Value.EndsWith("keys"))
+            {
+                await HandleKeysRequest(context);
+            }
             else if (context.Request.Path.Value.EndsWith("authorize"))
             {
                 await HandleAuthorizeRequest(context);
@@ -72,19 +77,38 @@
             await context.Response.WriteAsync(JsonConvert.SerializeObject(configuration, Formatting.Indented));
         }
 
+        private async Task HandleKeysRequest(IOwinContext context)
+        {
+            var response = "{\r\n  \"keys\": [\r\n    {\"kid\":\"xFuaJp6VZyqg_FBkzb0QIMdw5u09s3wFvnQ7p2Ngw8Y\",\"use\":\"sig\",\"key_ops\":[\"sign\"],\"kty\":\"RSA\",\"e\":\"AQAB\",\"n\":\"rxaBX-gqdL7ja0KLiAN7PIb1tJDASAvgFm2cziKeOdwkgGpvnL7yJrqn2zNfLgQPhsp_Ua4l2dTOpR1OdMPXgnY8u-n7ZP3BJINQqXA6qIU-_4YuVEmmpbE-Yu1eOQJRkUEqlhsb-t6K59EJKSciSwRx4nKWhC7WwPD9-sPcEgYyRqpNF2qtxr7ClVuGncq33j8ifAcRYKLN18Qd3ofvgDHKj9YBr81TeSJpJoyJ5KLHOknUTxHFSUdsN54wZADlppwGQLBjnRkqsErzVaHe1pea8qUONrbrc5vieL_7cewpLRViEvtsqSCcOBvTaZCcIAnJRySSsglFLtF9NAayNw\"}\r\n  ]\r\n}";
+            await context.Response.WriteAsync(response);
+        }
+
         private async Task HandleAuthorizeRequest(IOwinContext context)
         {
             var queries = HttpUtility.ParseQueryString(context.Request.Uri.Query);
 
-            var responseType = queries["response_type"];
             var redirectUri = queries["redirect_uri"];
+            var responseMode = queries["response_mode"];
+            var responseType = queries["response_type"];
             var scope = queries["openid"];
             var state = queries["state"];
 
-            // Return response.
+            const string code = "AwABAAAAvPM1KaPlrEqdFSBzjqfTGBCmLdgfSTLEMPGYuNHSUYBrqqf_ZT_p5uEAEJJ_nZ3UmphWygRNy2C3jJ239gV_DBnZ2syeg95Ki-374WHUP-i3yIhv5i-7KU2CEoPXwURQp6IVYMw-DjAOzn7C3JCu5wpngXmbZKtJdWmiBzHpcO2aICJPu1KvJrDLDP20chJBXzVYJtkfjviLNNW7l7Y3ydcHDsBRKZc3GuMQanmcghXPyoDg41g8XbwPudVh7uCmUponBQpIhbuffFP_tbV8SNzsPoFz9CLpBCZagJVXeqWoYMPe2dSsPiLO9Alf_YIe5zpi-zY4C3aLw5g9at35eZTfNd0gBRpR5ojkMIcZZ6IgAA";
 
-            context.Response.StatusCode = 200;
-            await context.Response.WriteAsync(string.Empty);
+            if (responseMode == "form_post")
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var redirectLocation = string.Format("id_token={0}&session_state={1}&state={2}", code, Guid.NewGuid().ToString().ToUpper(), Guid.NewGuid().ToString().ToUpper());
+                    await httpClient.PostAsync(redirectUri, new StringContent(redirectLocation));
+                }
+            }
+            else
+            {
+                // defaulting to query.
+                var redirectLocation = string.Format("{0}?code={1}&session_state={2}&state={3}", redirectUri, code, Guid.NewGuid().ToString().ToUpper(), Guid.NewGuid().ToString().ToUpper());
+                context.Response.Redirect(redirectLocation);
+            }
         }
     }
 }
