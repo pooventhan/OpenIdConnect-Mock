@@ -9,7 +9,7 @@
         // parameter in the WebApp.Start method.
         public void Configuration(IAppBuilder appBuilder)
         {
-            appBuilder.UseOpenIdConnectMock(new Uri("http://localhost:9000/"), "tenantname.onmicrosoft.com", "B2C_1A_SigninAdOnly");
+            appBuilder.UseOpenIdConnectMock(new Uri("http://localhost:9000"), "tenantname.onmicrosoft.com", "B2C_1A_SigninAdOnly");
         }
     }
 }
