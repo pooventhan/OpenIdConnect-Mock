@@ -49,7 +49,7 @@
                 Subject = claimsIdentity,
                 SigningCredentials = signingCredentials,
                 TokenIssuerName = Issuer,
-                AppliesToAddress = Realm, //Aud
+                AppliesToAddress = Realm,
                 Lifetime = lifetime,
             };
 
