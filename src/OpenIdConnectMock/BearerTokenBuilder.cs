@@ -21,18 +21,16 @@
                 new Claim(ClaimTypes.Name, name),
                 new Claim(ClaimTypes.Email, email),
                 new Claim(ClaimTypes.Role, role),
-                new Claim(ClaimTypes.Version, "1.0")
+                new Claim(ClaimTypes.Version, "1.0"),
+                new Claim("acr", policy),
+                new Claim("nonce", nonce),
+                new Claim("iat", DateTime.UtcNow.Ticks.ToString()),
+                new Claim("auth_time", DateTime.UtcNow.Ticks.ToString()),
+                new Claim("authenticationSource", "AzureADAuthentication"),
+                new Claim("idp", "https://sts.windows.net/be67623c-1932-42a6-9d24-6c359fe5ea71/"),
+                new Claim("alternativeSecurityId", "{\"type\":6,\"identityProvider\":\"https://sts.windows.net/be67623c-1932-42a6-9d24-6c359fe5ea71/\",\"key\":\"NDBmZTFhNGYtMTY1Ni00NjkzLTkzZmYtY2U5ZjFlN2U1Mjkx\"}"),
+                new Claim("sub", Guid.NewGuid().ToString())
             };
-
-            claims.Add(new Claim("acr", policy));
-            claims.Add(new Claim("nonce", nonce));
-            claims.Add(new Claim("iat", DateTime.UtcNow.Ticks.ToString()));
-            claims.Add(new Claim("auth_time", DateTime.UtcNow.Ticks.ToString()));
-            claims.Add(new Claim("authenticationSource", "AzureADAuthentication"));
-            claims.Add(new Claim("idp", "https://sts.windows.net/be67623c-1932-42a6-9d24-6c359fe5ea71/"));
-            claims.Add(new Claim("alternativeSecurityId", "{\"type\":6,\"identityProvider\":\"https://sts.windows.net/be67623c-1932-42a6-9d24-6c359fe5ea71/\",\"key\":\"NDBmZTFhNGYtMTY1Ni00NjkzLTkzZmYtY2U5ZjFlN2U1Mjkx\"}"));
-
-            claims.Add(new Claim("sub", Guid.NewGuid().ToString()));
 
             var claimsIdentity = new ClaimsIdentity(claims, "Custom");
             var symmetricKey = Convert.FromBase64String(Secret);
