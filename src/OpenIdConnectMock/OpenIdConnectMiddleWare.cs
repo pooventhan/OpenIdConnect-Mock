@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web;
@@ -98,16 +99,35 @@
 
             if (responseMode == "form_post")
             {
-                context.Response.StatusCode = 200;
-                await context.Response.WriteAsync("Authentication succesfull..");
+                // Prepare response.
+                var idToken = BearerTokenBuilder.CreateToken("I am administrator", "admin@test.com", "Administrator", this.defaultPolicy, nonce);
 
-                using (var httpClient = new HttpClient())
+                var returnParameters = new Dictionary<string, string>
                 {
-                    var idToken = BearerTokenBuilder.CreateToken("I am administrator", "admin@experian.com", "Administrator", this.defaultPolicy, nonce);
+                    { "state", state },
+                    { "code", Guid.NewGuid().ToString().ToUpper() },
+                    { "id_token", idToken }
+                };
 
-                    var redirectLocation = string.Format("state={0}&code={1}&id_token={2}", state, Guid.NewGuid().ToString().ToUpper(), idToken);
-                    await httpClient.PostAsync(redirectUri, new StringContent(redirectLocation));
+                var response = context.Response;
+                response.ContentType = "text/html";
+
+                await response.WriteAsync("<html>\n");
+                await response.WriteAsync("<body>\n");
+                await response.WriteAsync("<form name='form' method='post' action='" + redirectUri + "'>\n");
+
+                foreach (var param in returnParameters)
+                {
+                    var encodedValue = WebUtility.HtmlEncode(param.Value);
+                    var encodedKey = WebUtility.HtmlEncode(param.Key);
+                    await response.WriteAsync("<input type='hidden' name='" + encodedKey + "' value='" + encodedValue + "'>\n");
+                    await response.WriteAsync("<noscript>Click here to finish login: <input type='submit'></noscript>\n");
                 }
+
+                await response.WriteAsync("</form>\n");
+                await response.WriteAsync("<script>document.form.submit();</script>\n");
+                await response.WriteAsync("</body>\n");
+                await response.WriteAsync("</html>\n");
             }
             else
             {
